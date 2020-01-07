@@ -1,28 +1,29 @@
-# Terraform Module Template
-GitHub template to quick start creating terraform templates
+# Terraform AWS S3-hosted Static Site
 
-## To Use Template
-1. Click the "Use this template" button 
-2. Name your terraform module repo as `terraform-aws-<module_name>` (if creating non-AWS module change `aws` to the cloud provider)
-3. Rename this README's title to the title you named your repo in #2 
-4. Update this README to match the module's title (in the usage section)
-5. Update `example/example.tf` to match the module's title
-6. Remove this section from the README
-
- 
 ## Usage
 ```hcl
-module "<module_name>" {
-  source = "git@github.com:byu-oit/terraform-aws-<module_name>?ref=v1.0.0"
+module "s3_site" {
+  source    = "git@github.com:byu-oit/terraform-aws-s3-site?ref=v1.0.0"
+  env_tag   = "dev"
+  repo_name = "my-awesome-site"
+  branch    = "dev"
+  site_url  = "my-site.byu.edu"
 }
 ```
 
 ## Inputs
-| Name | Description | Default |
-| --- | --- | --- |
-| | |
+| Name | Type | Description | Default |
+| --- | --- | --- | --- |
+| evn_tag | string | The environment tag for the resources. |
+| data_sensitivity | string | The data-sensitivity tag for the resources. | confidential |
+| repo_name | string | The name of the repo containing the site. |
+| branch | string | Branch the site will be deployed from. |
+| index_doc | string | The index document of the site. | index.html |
+| origin_path | string | The path to the file in the S3 bucket (no trailing slash). | *Empty string* |
+| site_url | string | The URL for the site. |
 
 ## Outputs
-| Name | Description |
-| --- | --- |
-| | |
+| Name | Type | Description |
+| --- | --- | --- |
+| name_servers | set(string) | The name servers associated with the Route 53 hosted zone for the site. |
+| site_bucket | object | The deployment [S3 bucket object](https://www.terraform.io/docs/providers/aws/r/s3_bucket.html#attributes-reference). |
