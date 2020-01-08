@@ -30,7 +30,8 @@ module "cf_dist" {
   index_doc              = var.index_doc
   cname                  = var.site_url
   cname_ssl_cert_arn     = aws_acm_certificate.cert.arn
-  allowed_method         = ["GET", "HEAD"]
+  allowed_methods        = ["GET", "HEAD"]
+  wait_for_deployment    = false
 }
 
 module "hosted_zone" {
@@ -55,11 +56,8 @@ resource "aws_route53_record" "cert_validation" {
   name    = aws_acm_certificate.cert.domain_validation_options[0].resource_record_name
   type    = aws_acm_certificate.cert.domain_validation_options[0].resource_record_type
   zone_id = module.hosted_zone.hosted_zone.zone_id
-}
-
-resource "aws_acm_certificate_validation" "cert" {
-  certificate_arn         = aws_acm_certificate.cert.arn
-  validation_record_fqdns = [aws_route53_record.cert_validation.fqdn]
+  records = [aws_acm_certificate.cert.domain_validation_options[0].resource_record_value]
+  ttl     = 60
 }
 
 resource "aws_s3_bucket" "website" {
@@ -70,6 +68,12 @@ resource "aws_s3_bucket" "website" {
   }
 
   tags = local.tags
+
+  lifecycle {
+    ignore_changes = [
+      lifecycle_rule
+    ]
+  }
 }
 
 data "aws_iam_policy_document" "static_website" {
@@ -88,4 +92,10 @@ data "aws_iam_policy_document" "static_website" {
 resource "aws_s3_bucket_policy" "static_website_read" {
   bucket = aws_s3_bucket.website.id
   policy = data.aws_iam_policy_document.static_website.json
+
+  lifecycle {
+    ignore_changes = [
+      policy # The policy will get updated by ACS, so we need to ignore it after its created
+    ]
+  }
 }

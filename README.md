@@ -6,13 +6,13 @@ This Terraform module deploys an S3-hosted static site with HTTPS enabled.
 
 - S3 bucket to deploy files.
 - CloudFront distribution fronting the bucket to provide an SSL connection.
-- Route 53 hosted zone for the BYU subdomain with records to the CloudFront distribution
+- Route 53 hosted zone for the BYU sub-domain with records to the CloudFront distribution
 - ACM certificate for the URL
 
 ## Usage
 ```hcl
 module "s3_site" {
-  source    = "git@github.com:byu-oit/terraform-aws-s3-site?ref=v1.0.0"
+  source    = "git@github.com:byu-oit/terraform-aws-s3staticsite?ref=v1.0.0"
   env_tag   = "dev"
   repo_name = "my-awesome-site"
   branch    = "dev"
@@ -20,7 +20,10 @@ module "s3_site" {
 }
 ```
 
-**Note**: Using this module will require you to run `terraform apply` twice. The first time it will create the Route 53 hosted zone and certificate in ACM and then it will fail because it AWS can't validate the certificate. You need to contact the network team to setup a record in QIP for your desired subdomain name pointing to the name servers of the hosted zone created by Terraform (you can find that information in the Route 53 console). After AWS has validated the certificate (you can find that information in the ACM console), run `terraform apply` again and it should succeed.
+**Note**: Using this module will require you to run `terraform apply` twice. The first time it will create the Route 53 hosted zone, certificate in ACM, and S3 bucket for deployment. Then it will fail because AWS can't validate the certificate (you'll get an error message similar to the image below). You need to contact the network team to setup a record in QIP for your desired subdomain name pointing to the name servers of the hosted zone created by Terraform (you can find that information in the Route 53 console). After AWS has validated the certificate (you can find that information in the ACM console), run `terraform apply` again and it should succeed.
+
+**First Terraform Error**
+![First Terraform Error](readme/terraform-apply-1.png)
 
 ## Inputs
 | Name | Type | Description | Default |
