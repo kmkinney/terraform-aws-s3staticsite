@@ -4,7 +4,7 @@ provider "aws" {
 }
 
 module "s3_site" {
-  source    = "../"
+  source    = "git@github.com:byu-oit/terraform-aws-s3staticsite?ref=v1.0.0"
   env_tag   = "dev"
   repo_name = "terraform-module"
   branch    = "dev"
