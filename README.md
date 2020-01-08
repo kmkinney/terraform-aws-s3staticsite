@@ -35,6 +35,7 @@ module "s3_site" {
 | index_doc | string | The index document of the site. | index.html |
 | origin_path | string | The path to the file in the S3 bucket (no trailing slash). | *Empty string* |
 | site_url | string | The URL for the site. |
+| wait_for_deployment | string | Define if Terraform should wait for the distribution to deploy before completing. | `true` |
 
 ## Outputs
 | Name | Type | Description |

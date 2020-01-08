@@ -31,7 +31,7 @@ module "cf_dist" {
   cname                  = var.site_url
   cname_ssl_cert_arn     = aws_acm_certificate.cert.arn
   allowed_methods        = ["GET", "HEAD"]
-  wait_for_deployment    = false
+  wait_for_deployment    = var.wait_for_deployment
 }
 
 module "hosted_zone" {
