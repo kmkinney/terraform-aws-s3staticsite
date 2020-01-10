@@ -3,7 +3,10 @@ provider "aws" {
   region  = "us-west-2"
 }
 
-module "<module_name>" {
-  source = "git@github.com:byu-oit/terraform-aws-<module_name>?ref=v1.0.0"
-  #source = "../" # for local testing during module development
+module "s3_site" {
+  source    = "git@github.com:byu-oit/terraform-aws-s3staticsite?ref=v1.0.0"
+  env_tag   = "dev"
+  repo_name = "terraform-module"
+  branch    = "dev"
+  site_url  = "terraform-module.byu.edu"
 }
