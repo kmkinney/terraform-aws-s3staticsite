@@ -12,7 +12,7 @@ This Terraform module deploys an S3-hosted static site with HTTPS enabled.
 ## Usage
 ```hcl
 module "s3_site" {
-  source    = "git@github.com:byu-oit/terraform-aws-s3staticsite?ref=v1.0.0"
+  source    = "github.com/byu-oit/terraform-aws-s3staticsite?ref=v1.0.1"
   env_tag   = "dev"
   repo_name = "my-awesome-site"
   branch    = "dev"

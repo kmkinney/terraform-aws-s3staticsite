@@ -19,7 +19,7 @@ locals {
 }
 
 module "cf_dist" {
-  source                 = "git@github.com:byu-oit/terraform-aws-cloudfront-dist?ref=v1.0.0"
+  source                 = "github.com/byu-oit/terraform-aws-cloudfront-dist?ref=v1.0.0"
   env_tag                = var.env_tag
   data_sensitivity_tag   = var.data_sensitivity_tag
   origin_domain_name     = aws_s3_bucket.website.bucket_domain_name
@@ -35,7 +35,7 @@ module "cf_dist" {
 }
 
 module "hosted_zone" {
-  source               = "git@github.com:byu-oit/terraform-aws-custom-url.git?ref=v1.0.0"
+  source               = "github.com/byu-oit/terraform-aws-custom-url.git?ref=v1.0.0"
   env_tag              = var.env_tag
   data_sensitivity_tag = var.data_sensitivity_tag
   repo_name            = var.repo_name
