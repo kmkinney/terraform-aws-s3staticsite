@@ -65,6 +65,7 @@ resource "aws_s3_bucket" "website" {
 
   website {
     index_document = var.index_doc
+    error_document = var.error_doc
   }
 
   tags = local.tags
