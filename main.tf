@@ -28,7 +28,6 @@ module "cf_dist" {
   origin_protocol_policy = "http-only"
   origin_path            = var.origin_path
   index_doc              = var.index_doc
-  error_doc              = var.error_doc
   cname                  = var.site_url
   cname_ssl_cert_arn     = aws_acm_certificate.cert.arn
   allowed_methods        = ["GET", "HEAD"]
