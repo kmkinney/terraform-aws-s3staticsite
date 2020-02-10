@@ -25,6 +25,12 @@ variable "index_doc" {
   description = "The index document of the site."
 }
 
+variable "error_doc" {
+  type        = string
+  default     = "index.html"
+  description = "The error document (e.g. 404 page) of the site."
+}
+
 variable "origin_path" {
   type        = string
   default     = ""
