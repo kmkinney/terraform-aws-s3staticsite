@@ -22,7 +22,7 @@ module "cf_dist" {
   source                 = "github.com/byu-oit/terraform-aws-cloudfront-dist?ref=v1.0.0"
   env_tag                = var.env_tag
   data_sensitivity_tag   = var.data_sensitivity_tag
-  origin_domain_name     = aws_s3_bucket.website.bucket_domain_name
+  origin_domain_name     = aws_s3_bucket.website.website_endpoint
   origin_id              = aws_s3_bucket.website.bucket
   repo_name              = var.repo_name
   origin_protocol_policy = "http-only"
