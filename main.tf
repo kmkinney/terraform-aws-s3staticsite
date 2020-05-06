@@ -10,6 +10,12 @@ provider "aws" {
   region = "us-east-1"
 }
 
+data "aws_iam_account_alias" "current" {}
+data "aws_acm_certificate" "nva_account_cert" {
+  provider = aws.aws_n_va
+  domain   = "${data.aws_iam_account_alias.current.account_alias}.amazon.byu.edu"
+}
+
 locals {
   tags = {
     env              = var.env_tag
@@ -18,32 +24,7 @@ locals {
   }
 }
 
-module "cf_dist" {
-  source                 = "github.com/byu-oit/terraform-aws-cloudfront-dist?ref=v1.0.0"
-  env_tag                = var.env_tag
-  data_sensitivity_tag   = var.data_sensitivity_tag
-  origin_domain_name     = aws_s3_bucket.website.website_endpoint
-  origin_id              = aws_s3_bucket.website.bucket
-  repo_name              = var.repo_name
-  origin_protocol_policy = "http-only"
-  origin_path            = var.origin_path
-  index_doc              = var.index_doc
-  cname                  = var.site_url
-  cname_ssl_cert_arn     = aws_acm_certificate.cert.arn
-  allowed_methods        = ["GET", "HEAD"]
-  wait_for_deployment    = var.wait_for_deployment
-}
-
-module "hosted_zone" {
-  source               = "github.com/byu-oit/terraform-aws-custom-url.git?ref=v1.0.0"
-  env_tag              = var.env_tag
-  data_sensitivity_tag = var.data_sensitivity_tag
-  repo_name            = var.repo_name
-  url                  = var.site_url
-  alias_domain_name    = module.cf_dist.cloudfront_dist.domain_name
-  alias_zone_id        = module.cf_dist.cloudfront_dist.hosted_zone_id
-}
-
+//TODO: Always creates cert, which seems problematic/unncessary if we are trying to use an
 resource "aws_acm_certificate" "cert" {
   provider          = aws.aws_n_va
   domain_name       = var.site_url
@@ -52,12 +33,96 @@ resource "aws_acm_certificate" "cert" {
   tags = local.tags
 }
 
+resource "aws_cloudfront_distribution" "cdn" {
+  price_class = "PriceClass_100"
+  origin {
+    domain_name = aws_s3_bucket.website.website_endpoint
+    origin_id   = aws_s3_bucket.website.bucket
+    origin_path = var.origin_path
+
+    custom_origin_config {
+      http_port              = 80
+      https_port             = 443
+      origin_protocol_policy = "http-only"
+      origin_ssl_protocols   = ["TLSv1.2", "TLSv1.1", "TLSv1"]
+    }
+  }
+
+  comment             = "CDN for ${var.repo_name}"
+  enabled             = true
+  is_ipv6_enabled     = true
+  default_root_object = var.index_doc
+  //TODO: Does it actually work with no site url? Or did this only work for the submodule?
+  aliases = var.site_url != "" ? [var.site_url] : ["${var.repo_name}.${data.aws_iam_account_alias.current.account_alias}.amazon.byu.edu"]
+
+  default_cache_behavior {
+    target_origin_id = aws_s3_bucket.website.bucket
+    allowed_methods  = ["GET", "HEAD"]
+    cached_methods   = ["GET", "HEAD"]
+
+    forwarded_values {
+      query_string = false
+      cookies {
+        forward = "none"
+      }
+    }
+    viewer_protocol_policy = "redirect-to-https"
+  }
+
+  restrictions {
+    geo_restriction {
+      restriction_type = "none"
+    }
+  }
+
+  viewer_certificate {
+    acm_certificate_arn      = var.site_url == "" ? data.aws_acm_certificate.nva_account_cert.arn : aws_acm_certificate.cert.arn
+    ssl_support_method       = "sni-only"
+    minimum_protocol_version = "TLSv1.1_2016"
+  }
+
+  wait_for_deployment = var.wait_for_deployment
+
+  tags = local.tags
+}
+
+//TODO: How did it work if the site_url could be an empty string?
+resource "aws_route53_zone" "main" {
+  name = var.site_url
+
+  tags = local.tags
+}
+
 resource "aws_route53_record" "cert_validation" {
   name    = aws_acm_certificate.cert.domain_validation_options[0].resource_record_name
   type    = aws_acm_certificate.cert.domain_validation_options[0].resource_record_type
-  zone_id = module.hosted_zone.hosted_zone.zone_id
+  zone_id = aws_route53_zone.main.zone_id
   records = [aws_acm_certificate.cert.domain_validation_options[0].resource_record_value]
   ttl     = 60
+}
+
+resource "aws_route53_record" "custom-url-a" {
+  name    = var.site_url
+  type    = "A"
+  zone_id = aws_route53_zone.main.zone_id
+
+  alias {
+    evaluate_target_health = false
+    name                   = aws_cloudfront_distribution.cdn.domain_name
+    zone_id                = aws_cloudfront_distribution.cdn.hosted_zone_id
+  }
+}
+
+resource "aws_route53_record" "custom-url-4a" {
+  name    = var.site_url
+  type    = "AAAA"
+  zone_id = aws_route53_zone.main.zone_id
+
+  alias {
+    evaluate_target_health = false
+    name                   = aws_cloudfront_distribution.cdn.domain_name
+    zone_id                = aws_cloudfront_distribution.cdn.hosted_zone_id
+  }
 }
 
 resource "aws_s3_bucket" "website" {
@@ -96,6 +161,7 @@ resource "aws_s3_bucket_policy" "static_website_read" {
 
   lifecycle {
     ignore_changes = [
+      //TODO: What is ACS updating? Is it actually divvy cloud and should we be matching what they are changing it to?
       policy # The policy will get updated by ACS, so we need to ignore it after its created
     ]
   }
