@@ -24,7 +24,7 @@ locals {
   }
 }
 
-//TODO: Always creates cert, which seems problematic/unncessary if we are trying to use an
+//TODO: Always creates cert, which seems problematic/unncessary if we are trying to use an existing certification sometimes
 resource "aws_acm_certificate" "cert" {
   provider          = aws.aws_n_va
   domain_name       = var.site_url
@@ -53,6 +53,7 @@ resource "aws_cloudfront_distribution" "cdn" {
   is_ipv6_enabled     = true
   default_root_object = var.index_doc
   //TODO: Does it actually work with no site url? Or did this only work for the submodule?
+  //TODO: Repo Name might not be what we want here
   aliases = var.site_url != "" ? [var.site_url] : ["${var.repo_name}.${data.aws_iam_account_alias.current.account_alias}.amazon.byu.edu"]
 
   default_cache_behavior {
