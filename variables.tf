@@ -1,24 +1,3 @@
-variable "env_tag" {
-  type        = string
-  description = "The environment tag for the resources."
-}
-
-variable data_sensitivity_tag {
-  type        = string
-  default     = "confidential"
-  description = "The data-sensitivity tag for the resources."
-}
-
-variable "repo_name" {
-  type        = string
-  description = "The name of the repo containing the site."
-}
-
-variable "branch" {
-  type        = string
-  description = "Branch the site will be deployed from."
-}
-
 variable "index_doc" {
   type        = string
   default     = "index.html"
@@ -46,4 +25,15 @@ variable "wait_for_deployment" {
   type        = string
   description = "Define if Terraform should wait for the distribution to deploy before completing."
   default     = true
+}
+
+variable "s3_bucket_name" {
+  type = string
+  description = "Name of S3 bucket for website"
+}
+
+variable "tags" {
+  type        = map(string)
+  description = "A map of AWS Tags to attach to each resource created"
+  default     = {}
 }

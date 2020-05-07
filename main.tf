@@ -10,27 +10,14 @@ provider "aws" {
   region = "us-east-1"
 }
 
-data "aws_iam_account_alias" "current" {}
-data "aws_acm_certificate" "nva_account_cert" {
-  provider = aws.aws_n_va
-  domain   = "${data.aws_iam_account_alias.current.account_alias}.amazon.byu.edu"
-}
 
-locals {
-  tags = {
-    env              = var.env_tag
-    data-sensitivity = var.data_sensitivity_tag
-    repo             = "https://github.com/byu-oit/${var.repo_name}"
-  }
-}
-
-//TODO: Always creates cert, which seems problematic/unncessary if we are trying to use an existing certification sometimes
+//Always create a certificate. It takes several hours
 resource "aws_acm_certificate" "cert" {
   provider          = aws.aws_n_va
   domain_name       = var.site_url
   validation_method = "DNS"
 
-  tags = local.tags
+  tags = var.tags
 }
 
 resource "aws_cloudfront_distribution" "cdn" {
@@ -48,13 +35,11 @@ resource "aws_cloudfront_distribution" "cdn" {
     }
   }
 
-  comment             = "CDN for ${var.repo_name}"
+  comment             = "CDN for ${var.site_url}"
   enabled             = true
   is_ipv6_enabled     = true
   default_root_object = var.index_doc
-  //TODO: Does it actually work with no site url? Or did this only work for the submodule?
-  //TODO: Repo Name might not be what we want here
-  aliases = var.site_url != "" ? [var.site_url] : ["${var.repo_name}.${data.aws_iam_account_alias.current.account_alias}.amazon.byu.edu"]
+  aliases = [var.site_url]
 
   default_cache_behavior {
     target_origin_id = aws_s3_bucket.website.bucket
@@ -77,21 +62,20 @@ resource "aws_cloudfront_distribution" "cdn" {
   }
 
   viewer_certificate {
-    acm_certificate_arn      = var.site_url == "" ? data.aws_acm_certificate.nva_account_cert.arn : aws_acm_certificate.cert.arn
+    acm_certificate_arn      = aws_acm_certificate.cert.arn
     ssl_support_method       = "sni-only"
     minimum_protocol_version = "TLSv1.1_2016"
   }
 
   wait_for_deployment = var.wait_for_deployment
 
-  tags = local.tags
+  tags = var.tags
 }
 
-//TODO: How did it work if the site_url could be an empty string?
 resource "aws_route53_zone" "main" {
   name = var.site_url
 
-  tags = local.tags
+  tags = var.tags
 }
 
 resource "aws_route53_record" "cert_validation" {
@@ -127,19 +111,19 @@ resource "aws_route53_record" "custom-url-4a" {
 }
 
 resource "aws_s3_bucket" "website" {
-  bucket = "${var.repo_name}-${var.branch}-s3staticsite"
+  bucket = var.s3_bucket_name
 
   website {
     index_document = var.index_doc
     error_document = var.error_doc
   }
 
-  tags = local.tags
+  tags = var.tags
 
-  lifecycle {
-    ignore_changes = [
-      lifecycle_rule
-    ]
+  lifecycle_rule {
+    enabled                                = true
+    abort_incomplete_multipart_upload_days = 10
+    id                                     = "AutoAbortFailedMultipartUpload"
   }
 }
 
@@ -159,11 +143,4 @@ data "aws_iam_policy_document" "static_website" {
 resource "aws_s3_bucket_policy" "static_website_read" {
   bucket = aws_s3_bucket.website.id
   policy = data.aws_iam_policy_document.static_website.json
-
-  lifecycle {
-    ignore_changes = [
-      //TODO: What is ACS updating? Is it actually divvy cloud and should we be matching what they are changing it to?
-      policy # The policy will get updated by ACS, so we need to ignore it after its created
-    ]
-  }
 }
