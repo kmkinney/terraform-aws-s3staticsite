@@ -10,13 +10,21 @@ provider "aws" {
   region = "us-east-1"
 }
 
-
+//TODO: Consider pulling out these two resources into a separate module used by project
 //Always create a certificate. It may takes several hours
 resource "aws_acm_certificate" "cert" {
   provider          = aws.aws_n_va
   domain_name       = var.site_url
   validation_method = "DNS"
   tags              = var.tags
+}
+
+resource "aws_route53_record" "cert_validation" {
+  name    = aws_acm_certificate.cert.domain_validation_options[0].resource_record_name
+  type    = aws_acm_certificate.cert.domain_validation_options[0].resource_record_type
+  zone_id = aws_route53_zone.main.zone_id
+  records = [aws_acm_certificate.cert.domain_validation_options[0].resource_record_value]
+  ttl     = 60
 }
 
 resource "aws_cloudfront_distribution" "cdn" {
@@ -73,14 +81,6 @@ resource "aws_cloudfront_distribution" "cdn" {
 resource "aws_route53_zone" "main" {
   name = var.site_url
   tags = var.tags
-}
-
-resource "aws_route53_record" "cert_validation" {
-  name    = aws_acm_certificate.cert.domain_validation_options[0].resource_record_name
-  type    = aws_acm_certificate.cert.domain_validation_options[0].resource_record_type
-  zone_id = aws_route53_zone.main.zone_id
-  records = [aws_acm_certificate.cert.domain_validation_options[0].resource_record_value]
-  ttl     = 60
 }
 
 resource "aws_route53_record" "custom-url-a" {
