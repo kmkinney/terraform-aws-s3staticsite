@@ -37,3 +37,9 @@ variable "tags" {
   description = "A map of AWS Tags to attach to each resource created"
   default     = {}
 }
+
+variable "cloudfront_price_class" {
+  type = string
+  description = "The price class for the cloudfront distribution"
+  default = "PriceClass_100"
+}

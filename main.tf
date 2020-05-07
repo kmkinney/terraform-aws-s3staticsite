@@ -11,17 +11,16 @@ provider "aws" {
 }
 
 
-//Always create a certificate. It takes several hours
+//Always create a certificate. It may takes several hours
 resource "aws_acm_certificate" "cert" {
   provider          = aws.aws_n_va
   domain_name       = var.site_url
   validation_method = "DNS"
-
-  tags = var.tags
+  tags              = var.tags
 }
 
 resource "aws_cloudfront_distribution" "cdn" {
-  price_class = "PriceClass_100"
+  price_class = var.cloudfront_price_class
   origin {
     domain_name = aws_s3_bucket.website.website_endpoint
     origin_id   = aws_s3_bucket.website.bucket
@@ -39,7 +38,7 @@ resource "aws_cloudfront_distribution" "cdn" {
   enabled             = true
   is_ipv6_enabled     = true
   default_root_object = var.index_doc
-  aliases = [var.site_url]
+  aliases             = [var.site_url]
 
   default_cache_behavior {
     target_origin_id = aws_s3_bucket.website.bucket
@@ -68,13 +67,11 @@ resource "aws_cloudfront_distribution" "cdn" {
   }
 
   wait_for_deployment = var.wait_for_deployment
-
-  tags = var.tags
+  tags                = var.tags
 }
 
 resource "aws_route53_zone" "main" {
   name = var.site_url
-
   tags = var.tags
 }
 
@@ -118,13 +115,13 @@ resource "aws_s3_bucket" "website" {
     error_document = var.error_doc
   }
 
-  tags = var.tags
-
   lifecycle_rule {
     enabled                                = true
     abort_incomplete_multipart_upload_days = 10
     id                                     = "AutoAbortFailedMultipartUpload"
   }
+
+  tags = var.tags
 }
 
 data "aws_iam_policy_document" "static_website" {
