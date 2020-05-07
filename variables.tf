@@ -28,7 +28,7 @@ variable "wait_for_deployment" {
 }
 
 variable "s3_bucket_name" {
-  type = string
+  type        = string
   description = "Name of S3 bucket for website"
 }
 
@@ -39,7 +39,12 @@ variable "tags" {
 }
 
 variable "cloudfront_price_class" {
-  type = string
+  type        = string
   description = "The price class for the cloudfront distribution"
-  default = "PriceClass_100"
+  default     = "PriceClass_100"
+}
+
+variable "hosted_zone_id" {
+  type        = string
+  description = "hosted zone id"
 }

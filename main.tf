@@ -10,8 +10,6 @@ provider "aws" {
   region = "us-east-1"
 }
 
-//TODO: Consider pulling out these two resources into a separate module used by project
-//Always create a certificate. It may takes several hours
 resource "aws_acm_certificate" "cert" {
   provider          = aws.aws_n_va
   domain_name       = var.site_url
@@ -19,10 +17,17 @@ resource "aws_acm_certificate" "cert" {
   tags              = var.tags
 }
 
+resource "aws_acm_certificate_validation" "cert" {
+  provider = aws.aws_n_va
+  certificate_arn         = aws_acm_certificate.cert.arn
+  validation_record_fqdns = [aws_route53_record.cert_validation.fqdn]
+}
+
 resource "aws_route53_record" "cert_validation" {
+  provider = aws.aws_n_va
   name    = aws_acm_certificate.cert.domain_validation_options[0].resource_record_name
   type    = aws_acm_certificate.cert.domain_validation_options[0].resource_record_type
-  zone_id = aws_route53_zone.main.zone_id
+  zone_id = var.hosted_zone_id
   records = [aws_acm_certificate.cert.domain_validation_options[0].resource_record_value]
   ttl     = 60
 }
@@ -69,7 +74,7 @@ resource "aws_cloudfront_distribution" "cdn" {
   }
 
   viewer_certificate {
-    acm_certificate_arn      = aws_acm_certificate.cert.arn
+    acm_certificate_arn      = aws_acm_certificate_validation.cert.certificate_arn
     ssl_support_method       = "sni-only"
     minimum_protocol_version = "TLSv1.1_2016"
   }
@@ -78,15 +83,15 @@ resource "aws_cloudfront_distribution" "cdn" {
   tags                = var.tags
 }
 
-resource "aws_route53_zone" "main" {
-  name = var.site_url
-  tags = var.tags
-}
+//resource "aws_route53_zone" "main" {
+//  name = var.site_url
+//  tags = var.tags
+//}
 
 resource "aws_route53_record" "custom-url-a" {
   name    = var.site_url
   type    = "A"
-  zone_id = aws_route53_zone.main.zone_id
+  zone_id = var.hosted_zone_id
 
   alias {
     evaluate_target_health = false
@@ -98,7 +103,7 @@ resource "aws_route53_record" "custom-url-a" {
 resource "aws_route53_record" "custom-url-4a" {
   name    = var.site_url
   type    = "AAAA"
-  zone_id = aws_route53_zone.main.zone_id
+  zone_id = var.hosted_zone_id
 
   alias {
     evaluate_target_health = false
