@@ -42,5 +42,4 @@ module "s3_site" {
 ## Outputs
 | Name | Type | Description |
 | --- | --- | --- |
-| name_servers | set(string) | The name servers associated with the Route 53 hosted zone for the site. |
 | site_bucket | object | The deployment [S3 bucket object](https://www.terraform.io/docs/providers/aws/r/s3_bucket.html#attributes-reference). |

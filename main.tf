@@ -83,11 +83,6 @@ resource "aws_cloudfront_distribution" "cdn" {
   tags                = var.tags
 }
 
-//resource "aws_route53_zone" "main" {
-//  name = var.site_url
-//  tags = var.tags
-//}
-
 resource "aws_route53_record" "custom-url-a" {
   name    = var.site_url
   type    = "A"
