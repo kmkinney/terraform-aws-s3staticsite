@@ -12,11 +12,13 @@ This Terraform module deploys an S3-hosted static site with HTTPS enabled.
 ## Usage
 ```hcl
 module "s3_site" {
-  source    = "github.com/byu-oit/terraform-aws-s3staticsite?ref=v1.2.0"
-  env_tag   = "dev"
-  repo_name = "my-awesome-site"
-  branch    = "dev"
-  site_url  = "my-site.byu.edu"
+  source    = "github.com/byu-oit/terraform-aws-s3staticsite?ref=v2.0.0"
+  site_url       = "my-site.byu.edu"
+  hosted_zone_id = "zoneid"
+  s3_bucket_name = "bucket-name"
+  tags = {
+    "tag" = "value"
+  }
 }
 ```
 
@@ -28,18 +30,16 @@ module "s3_site" {
 ## Inputs
 | Name | Type | Description | Default |
 | --- | --- | --- | --- |
-| evn_tag | string | The environment tag for the resources. |
-| data_sensitivity | string | The data-sensitivity tag for the resources. | confidential |
-| repo_name | string | The name of the repo containing the site. |
-| branch | string | Branch the site will be deployed from. |
-| index_doc | string | The index document of the site. | index.html |
+| hosted_zone_id | string | Hosted Zone ID
+| index_doc | string | The index document of the site. | index.html | 
 | error_doc | string | The error document (e.g. 404 page) of the site. | index.html |
 | origin_path | string | The path to the file in the S3 bucket (no trailing slash). | *Empty string* |
 | site_url | string | The URL for the site. |
 | wait_for_deployment | string | Define if Terraform should wait for the distribution to deploy before completing. | `true` |
-
+| s3_bucket_name | string | Name of S3 bucket for the website
+| tags | map(string) | A map of AWS Tags to attach to each resource created | {}
+| cloudfront_price_class | string | The price class for the cloudfront distribution | PriceClass_100
 ## Outputs
 | Name | Type | Description |
 | --- | --- | --- |
-| name_servers | set(string) | The name servers associated with the Route 53 hosted zone for the site. |
 | site_bucket | object | The deployment [S3 bucket object](https://www.terraform.io/docs/providers/aws/r/s3_bucket.html#attributes-reference). |

@@ -1,24 +1,3 @@
-variable "env_tag" {
-  type        = string
-  description = "The environment tag for the resources."
-}
-
-variable data_sensitivity_tag {
-  type        = string
-  default     = "confidential"
-  description = "The data-sensitivity tag for the resources."
-}
-
-variable "repo_name" {
-  type        = string
-  description = "The name of the repo containing the site."
-}
-
-variable "branch" {
-  type        = string
-  description = "Branch the site will be deployed from."
-}
-
 variable "index_doc" {
   type        = string
   default     = "index.html"
@@ -43,7 +22,29 @@ variable "site_url" {
 }
 
 variable "wait_for_deployment" {
-  type = string
+  type        = string
   description = "Define if Terraform should wait for the distribution to deploy before completing."
-  default = true
+  default     = true
+}
+
+variable "s3_bucket_name" {
+  type        = string
+  description = "Name of S3 bucket for website"
+}
+
+variable "tags" {
+  type        = map(string)
+  description = "A map of AWS Tags to attach to each resource created"
+  default     = {}
+}
+
+variable "cloudfront_price_class" {
+  type        = string
+  description = "The price class for the cloudfront distribution"
+  default     = "PriceClass_100"
+}
+
+variable "hosted_zone_id" {
+  type        = string
+  description = "hosted zone id"
 }
