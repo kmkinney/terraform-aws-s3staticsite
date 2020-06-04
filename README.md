@@ -12,7 +12,7 @@ This Terraform module deploys an S3-hosted static site with HTTPS enabled.
 ## Usage
 ```hcl
 module "s3_site" {
-  source    = "github.com/byu-oit/terraform-aws-s3staticsite?ref=v2.0.0"
+  source    = "github.com/byu-oit/terraform-aws-s3staticsite?ref=v2.0.1"
   site_url       = "my-site.byu.edu"
   hosted_zone_id = "zoneid"
   s3_bucket_name = "bucket-name"
@@ -43,3 +43,4 @@ module "s3_site" {
 | Name | Type | Description |
 | --- | --- | --- |
 | site_bucket | object | The deployment [S3 bucket object](https://www.terraform.io/docs/providers/aws/r/s3_bucket.html#attributes-reference). |
+| cf_distribution | object | The deployed [CloudFront distribution](https://www.terraform.io/docs/providers/aws/r/cloudfront_distribution.html#attribute-reference). |
