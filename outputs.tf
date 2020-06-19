@@ -5,3 +5,7 @@ output "site_bucket" {
 output "cf_distribution" {
   value = aws_cloudfront_distribution.cdn
 }
+
+output "dns_record" {
+  value = aws_route53_record.custom-url-a
+}
