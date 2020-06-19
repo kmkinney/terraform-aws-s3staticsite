@@ -12,7 +12,7 @@ This Terraform module deploys an S3-hosted static site with HTTPS enabled.
 ## Usage
 ```hcl
 module "s3_site" {
-  source    = "github.com/byu-oit/terraform-aws-s3staticsite?ref=v2.0.1"
+  source    = "github.com/byu-oit/terraform-aws-s3staticsite?ref=v2.0.2"
   site_url       = "my-site.byu.edu"
   hosted_zone_id = "zoneid"
   s3_bucket_name = "bucket-name"
@@ -28,19 +28,20 @@ module "s3_site" {
 ![First Terraform Error](readme/terraform-apply-1.png)
 
 ## Inputs
-| Name | Type | Description | Default |
-| --- | --- | --- | --- |
-| hosted_zone_id | string | Hosted Zone ID
-| index_doc | string | The index document of the site. | index.html | 
-| error_doc | string | The error document (e.g. 404 page) of the site. | index.html |
-| origin_path | string | The path to the file in the S3 bucket (no trailing slash). | *Empty string* |
-| site_url | string | The URL for the site. |
-| wait_for_deployment | string | Define if Terraform should wait for the distribution to deploy before completing. | `true` |
-| s3_bucket_name | string | Name of S3 bucket for the website
-| tags | map(string) | A map of AWS Tags to attach to each resource created | {}
-| cloudfront_price_class | string | The price class for the cloudfront distribution | PriceClass_100
+| Name                   | Type        | Description                                                                       | Default        |
+| ---------------------- | ----------- | --------------------------------------------------------------------------------- | -------------- |
+| hosted_zone_id         | string      | Hosted Zone ID                                                                    |
+| index_doc              | string      | The index document of the site.                                                   | index.html     |
+| error_doc              | string      | The error document (e.g. 404 page) of the site.                                   | index.html     |
+| origin_path            | string      | The path to the file in the S3 bucket (no trailing slash).                        | *Empty string* |
+| site_url               | string      | The URL for the site.                                                             |
+| wait_for_deployment    | string      | Define if Terraform should wait for the distribution to deploy before completing. | `true`         |
+| s3_bucket_name         | string      | Name of S3 bucket for the website                                                 |
+| tags                   | map(string) | A map of AWS Tags to attach to each resource created                              | {}             |
+| cloudfront_price_class | string      | The price class for the cloudfront distribution                                   | PriceClass_100 |
 ## Outputs
-| Name | Type | Description |
-| --- | --- | --- |
-| site_bucket | object | The deployment [S3 bucket object](https://www.terraform.io/docs/providers/aws/r/s3_bucket.html#attributes-reference). |
-| cf_distribution | object | The deployed [CloudFront distribution](https://www.terraform.io/docs/providers/aws/r/cloudfront_distribution.html#attribute-reference). |
+| Name            | Type                                                                                                     | Description                                             |
+| --------------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| site_bucket     | [object](https://www.terraform.io/docs/providers/aws/r/s3_bucket.html#attributes-reference)              | The deployed S3 bucket.                                 |
+| cf_distribution | [object](https://www.terraform.io/docs/providers/aws/r/cloudfront_distribution.html#attribute-reference) | The deployed CloudFront distribution.                   |
+| dns_record      | [object](https://www.terraform.io/docs/providers/aws/r/route53_record.html#attributes-reference)         | The DNS A-record mapped to the CloudFront Distribution. |
