@@ -11,7 +11,7 @@ data "aws_route53_zone" "zone" {
 
 module "s3_site" {
   source = "github.com/byu-oit/terraform-aws-s3staticsite?ref=v2.0.2"
-  # source         = "../"
+  # source         = "../../"
   site_url       = "teststatic.byu-oit-terraform-dev.amazon.byu.edu"
   hosted_zone_id = data.aws_route53_zone.zone.id
   s3_bucket_name = "terraform-module-dev-s3staticsite"
