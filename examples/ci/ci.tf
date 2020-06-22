@@ -1,3 +1,7 @@
+terraform {
+  required_version = "0.12.26"
+}
+
 provider "aws" {
   version = "~> 2.42"
   region  = "us-west-2"
@@ -10,8 +14,7 @@ data "aws_route53_zone" "zone" {
 }
 
 module "s3_site" {
-  source = "github.com/byu-oit/terraform-aws-s3staticsite?ref=v2.0.2"
-  # source         = "../"
+  source         = "../../"
   site_url       = "teststatic.byu-oit-terraform-dev.amazon.byu.edu"
   hosted_zone_id = data.aws_route53_zone.zone.id
   s3_bucket_name = "terraform-module-dev-s3staticsite"
@@ -22,10 +25,14 @@ module "s3_site" {
   }
 }
 
-output "bucket_name" {
-  value = module.s3_site.site_bucket.bucket
+output "site_bucket" {
+  value = module.s3_site.site_bucket
 }
 
-output "url" {
-  value = module.s3_site.dns_record.name
+output "cf_distribution" {
+  value = module.s3_site.cf_distribution
+}
+
+output "dns_record" {
+  value = module.s3_site.dns_record
 }
