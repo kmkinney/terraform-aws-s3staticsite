@@ -39,6 +39,7 @@ module "s3_site" {
 | s3_bucket_name         | string      | Name of S3 bucket for the website                                                 |
 | tags                   | map(string) | A map of AWS Tags to attach to each resource created                              | {}             |
 | cloudfront_price_class | string      | The price class for the cloudfront distribution                                   | PriceClass_100 |
+| cors_rule              | object      | The CORS policy for S3 bucket                                                     | {}             |
 ## Outputs
 | Name            | Type                                                                                                     | Description                                             |
 | --------------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
