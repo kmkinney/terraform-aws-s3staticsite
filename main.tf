@@ -130,6 +130,7 @@ resource "aws_s3_bucket" "website" {
   }
 
   tags = var.tags
+  cors_rule = var.cors_rule
 }
 
 data "aws_iam_policy_document" "static_website" {
