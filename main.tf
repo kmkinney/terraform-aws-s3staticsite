@@ -129,7 +129,7 @@ resource "aws_s3_bucket" "website" {
     id                                     = "AutoAbortFailedMultipartUpload"
   }
 
-  tags = var.tags
+  tags      = var.tags
   cors_rule = var.cors_rule
 }
 
