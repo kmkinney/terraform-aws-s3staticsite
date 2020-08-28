@@ -117,7 +117,7 @@ resource "aws_route53_record" "custom-url-4a" {
 
 resource "aws_s3_bucket" "website" {
   bucket = var.s3_bucket_name
-  tags = var.tags
+  tags   = var.tags
 
   website {
     index_document = var.index_doc
@@ -130,7 +130,7 @@ resource "aws_s3_bucket" "website" {
     id                                     = "AutoAbortFailedMultipartUpload"
   }
 
-	dynamic "cors_rule" {
+  dynamic "cors_rule" {
     for_each = var.cors_rules
     content {
       allowed_headers = cors_rule.value["allowed_headers"]
