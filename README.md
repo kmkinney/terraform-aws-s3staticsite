@@ -12,7 +12,7 @@ This Terraform module deploys an S3-hosted static site with HTTPS enabled.
 ## Usage
 ```hcl
 module "s3_site" {
-  source    = "github.com/byu-oit/terraform-aws-s3staticsite?ref=v3.0.0"
+  source    = "github.com/byu-oit/terraform-aws-s3staticsite?ref=v3.0.1"
   site_url       = "my-site.byu.edu"
   hosted_zone_id = "zoneid"
   s3_bucket_name = "bucket-name"
@@ -39,6 +39,7 @@ module "s3_site" {
 | s3_bucket_name         | string      | Name of S3 bucket for the website                                                 |
 | tags                   | map(string) | A map of AWS Tags to attach to each resource created                              | {}             |
 | cloudfront_price_class | string      | The price class for the cloudfront distribution                                   | PriceClass_100 |
+| cors_rules             | list(object) | The CORS policies for S3 bucket                                                  | []             |
 ## Outputs
 | Name            | Type                                                                                                     | Description                                             |
 | --------------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |

@@ -25,6 +25,34 @@ module "s3_site" {
   }
 }
 
+module "s3_site_with_cors" {
+  source         = "../../"
+  site_url       = "teststatic.byu-oit-terraform-dev.amazon.byu.edu"
+  hosted_zone_id = data.aws_route53_zone.zone.id
+  s3_bucket_name = "terraform-module-dev-s3staticsite"
+  tags = {
+    "data-sensitivity" = "confidential"
+    "env"              = "dev"
+    "repo"             = "https://github.com/byu-oit/terraform-module"
+  }
+  cors_rules = [
+    {
+      allowed_headers = ["*"]
+      allowed_methods = ["PUT", "POST"]
+      allowed_origins = ["https://s3-website-test.hashicorp.com"]
+      expose_headers  = ["ETag"]
+      max_age_seconds = 3000
+    },
+    {
+      allowed_headers = ["*"]
+      allowed_methods = ["PUT", "POST"]
+      allowed_origins = ["https://example.com"]
+      expose_headers  = ["ETag"]
+      max_age_seconds = 3000
+    }
+  ]
+}
+
 output "site_bucket" {
   value = module.s3_site.site_bucket
 }
