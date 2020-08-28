@@ -49,8 +49,8 @@ variable "hosted_zone_id" {
   description = "hosted zone id"
 }
 
-variable "cors_rule" {
-  type        = object({ allowed_headers = list(string), allowed_methods = list(string), allowed_origins = list(string), expose_headers = list(string), max_age_seconds = number })
-  default     = {}
+variable "cors_rules" {
+  type        = list(object({ allowed_headers = list(string), allowed_methods = list(string), allowed_origins = list(string), expose_headers = list(string), max_age_seconds = number }))
+  default     = []
   description = "cors policy rules"
 }
