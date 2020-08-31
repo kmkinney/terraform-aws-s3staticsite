@@ -51,7 +51,7 @@ resource "aws_cloudfront_distribution" "cdn" {
       http_port              = 80
       https_port             = 443
       origin_protocol_policy = "http-only"
-      origin_ssl_protocols   = ["TLSv1.2", "TLSv1.1", "TLSv1"]
+      origin_ssl_protocols   = ["TLSv1.2"]
     }
   }
 
@@ -84,7 +84,7 @@ resource "aws_cloudfront_distribution" "cdn" {
   viewer_certificate {
     acm_certificate_arn      = aws_acm_certificate_validation.cert.certificate_arn
     ssl_support_method       = "sni-only"
-    minimum_protocol_version = "TLSv1.1_2016"
+    minimum_protocol_version = "TLSv1.2_2019"
   }
 
   wait_for_deployment = var.wait_for_deployment
