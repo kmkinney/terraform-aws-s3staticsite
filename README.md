@@ -12,7 +12,7 @@ This Terraform module deploys an S3-hosted static site with HTTPS enabled.
 ## Usage
 ```hcl
 module "s3_site" {
-  source    = "github.com/byu-oit/terraform-aws-s3staticsite?ref=v5.0.0"
+  source    = "github.com/byu-oit/terraform-aws-s3staticsite?ref=v5.1.0"
   site_url       = "my-site.byu.edu"
   hosted_zone_id = "zoneid"
   s3_bucket_name = "bucket-name"
@@ -44,6 +44,7 @@ module "s3_site" {
 | encryption_key_arn     | string       | The ARN of the KMS key used to encrypt data in the S3 buckets.                   | aws/s3 ARN     |
 | log_cookies            | bool         | Include cookies in the CloudFront access logs.                                   | `false`        |
 | force_destroy          | bool         | Destroy site buckets even if they're not empty on a `terraform destroy` command. | `false`
+| waf_acl_arn            | string       | The ARN of the WAF that should front the CloudFront distribution.                |
 ## Outputs
 | Name            | Type                                                                                                     | Description                                             |
 | --------------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |

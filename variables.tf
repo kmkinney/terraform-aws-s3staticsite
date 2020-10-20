@@ -78,3 +78,9 @@ variable "force_destroy" {
   default     = false
   description = "Destroy site buckets even if they're not empty on a 'terraform destroy' command."
 }
+
+variable "waf_acl_arn" {
+  type        = string
+  default     = ""
+  description = "The ARN of the WAF that should front the CloudFront distribution."
+}
