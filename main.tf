@@ -1,7 +1,14 @@
 terraform {
   required_version = ">= 0.12.16"
   required_providers {
-    aws = ">= 3.0"
+    aws = {
+      source = "hashicorp/aws"
+      version = ">= 3.0"
+    }
+    random = {
+      source = "hashicorp/random"
+      version = ">= 3.0"
+    }
   }
 }
 
@@ -42,12 +49,7 @@ resource "aws_route53_record" "cert_validation" {
 
 resource "random_string" "cf_key" {
   length = 32
-}
-
-resource "aws_ssm_parameter" "cf_key" {
-  name = "/${var.site_url}/referrer-header"
-  type = "SecureString"
-  value = random_string.cf_key.result
+  special = false
 }
 
 resource "aws_cloudfront_distribution" "cdn" {
@@ -66,7 +68,7 @@ resource "aws_cloudfront_distribution" "cdn" {
 
     custom_header {
       name = "Referer"
-      value = aws_ssm_parameter.cf_key.value
+      value = random_string.cf_key.result
     }
   }
 
@@ -135,13 +137,10 @@ resource "aws_route53_record" "custom_url_4a" {
   }
 }
 
-data "aws_kms_key" "default_s3_key" {
-  key_id = "alias/aws/s3"
-}
-
 resource "aws_s3_bucket" "website" {
   bucket = var.s3_bucket_name
   tags   = var.tags
+  force_destroy = var.force_destroy
 
   website {
     index_document = var.index_doc
@@ -174,7 +173,7 @@ resource "aws_s3_bucket" "website" {
     rule {
       apply_server_side_encryption_by_default {
         sse_algorithm     = "aws:kms"
-        kms_master_key_id = var.encryption_key_arn == "" ? data.aws_kms_key.default_s3_key.id : var.encryption_key_arn
+        kms_master_key_id = var.encryption_key_arn == "" ? "alias/aws/s3" : var.encryption_key_arn
       }
     }
   }
@@ -193,7 +192,7 @@ data "aws_iam_policy_document" "static_website" {
 
     condition {
       test = "StringLike"
-      values = [aws_ssm_parameter.cf_key.value]
+      values = [random_string.cf_key.result]
       variable = "aws:Referer"
     }
   }
@@ -225,6 +224,7 @@ resource "aws_s3_bucket_policy" "static_website_read" {
 resource "aws_s3_bucket" "logging" {
   bucket = "${var.site_url}-access-logs"
   tags   = var.tags
+  force_destroy = var.force_destroy
 
   lifecycle_rule {
     id      = "logs"
@@ -240,11 +240,22 @@ resource "aws_s3_bucket" "logging" {
     }
   }
 
+  lifecycle_rule {
+    enabled                                = true
+    abort_incomplete_multipart_upload_days = 10
+    id                                     = "AutoAbortFailedMultipartUpload"
+
+    expiration {
+      days                         = 0
+      expired_object_delete_marker = false
+    }
+  }
+
   server_side_encryption_configuration {
     rule {
       apply_server_side_encryption_by_default {
         sse_algorithm     = "aws:kms"
-        kms_master_key_id = var.encryption_key_arn == "" ? data.aws_kms_key.default_s3_key.id : var.encryption_key_arn
+        kms_master_key_id = var.encryption_key_arn == "" ? "alias/aws/s3" : var.encryption_key_arn
       }
     }
   }
