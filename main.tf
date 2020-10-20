@@ -196,24 +196,6 @@ data "aws_iam_policy_document" "static_website" {
       variable = "aws:Referer"
     }
   }
-
-  statement {
-    sid       = "2"
-    effect    = "Deny"
-    actions   = ["s3:GetObject"]
-    resources = ["${aws_s3_bucket.website.arn}/*"]
-
-    condition {
-      test     = "Bool"
-      values   = ["false"]
-      variable = "aws:SecureTransport"
-    }
-
-    principals {
-      identifiers = ["*"]
-      type        = "*"
-    }
-  }
 }
 
 resource "aws_s3_bucket_policy" "static_website_read" {
