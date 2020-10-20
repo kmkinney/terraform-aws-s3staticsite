@@ -77,6 +77,7 @@ resource "aws_cloudfront_distribution" "cdn" {
   is_ipv6_enabled     = true
   default_root_object = var.index_doc
   aliases             = [var.site_url]
+  web_acl_id          = var.waf_acl_arn
 
   logging_config {
     bucket          = aws_s3_bucket.logging.bucket_domain_name
