@@ -22,7 +22,7 @@ variable "site_url" {
 }
 
 variable "wait_for_deployment" {
-  type        = string
+  type        = bool
   description = "Define if Terraform should wait for the distribution to deploy before completing."
   default     = true
 }
@@ -53,4 +53,22 @@ variable "cors_rules" {
   type        = list(object({ allowed_headers = list(string), allowed_methods = list(string), allowed_origins = list(string), expose_headers = list(string), max_age_seconds = number }))
   default     = []
   description = "cors policy rules"
+}
+
+variable "forward_query_strings" {
+  type = bool
+  default = false
+  description = "Forward query strings to the origin."
+}
+
+variable "encryption_key_arn" {
+  type = string
+  default = ''
+  description = "The ARN of the KMS key used to encrypt data in the S3 buckets."
+}
+
+variable "log_cookies" {
+  type = bool
+  default = false
+  description = "Include cookies in the CloudFront access logs."
 }

@@ -35,11 +35,14 @@ module "s3_site" {
 | error_doc              | string      | The error document (e.g. 404 page) of the site.                                   | index.html     |
 | origin_path            | string      | The path to the file in the S3 bucket (no trailing slash).                        | *Empty string* |
 | site_url               | string      | The URL for the site.                                                             |
-| wait_for_deployment    | string      | Define if Terraform should wait for the distribution to deploy before completing. | `true`         |
+| wait_for_deployment    | bool        | Define if Terraform should wait for the distribution to deploy before completing. | `true`         |
 | s3_bucket_name         | string      | Name of S3 bucket for the website                                                 |
 | tags                   | map(string) | A map of AWS Tags to attach to each resource created                              | {}             |
 | cloudfront_price_class | string      | The price class for the cloudfront distribution                                   | PriceClass_100 |
 | cors_rules             | list(object) | The CORS policies for S3 bucket                                                  | []             |
+| forward_query_strings  | bool         | Forward query strings to the origin.                                             | `false`        |
+| encryption_key_arn     | string       | The ARN of the KMS key used to encrypt data in the S3 buckets.                   | aws/s3 ARN     |
+| log_cookies            | bool         | Include cookies in the CloudFront access logs.                                   | `false`        |
 ## Outputs
 | Name            | Type                                                                                                     | Description                                             |
 | --------------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
