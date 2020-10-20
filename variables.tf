@@ -61,12 +61,6 @@ variable "forward_query_strings" {
   description = "Forward query strings to the origin."
 }
 
-variable "encryption_key_arn" {
-  type        = string
-  default     = ""
-  description = "The ARN of the KMS key used to encrypt data in the S3 buckets."
-}
-
 variable "log_cookies" {
   type        = bool
   default     = false
