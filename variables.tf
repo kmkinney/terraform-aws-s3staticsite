@@ -76,5 +76,5 @@ variable "log_cookies" {
 variable "force_destroy" {
   type        = bool
   default     = false
-  description = "Destroy site buckets even if they're not empty."
+  description = "Destroy site buckets even if they're not empty on a 'terraform destroy' command."
 }

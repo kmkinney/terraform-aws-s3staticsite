@@ -43,7 +43,7 @@ module "s3_site" {
 | forward_query_strings  | bool         | Forward query strings to the origin.                                             | `false`        |
 | encryption_key_arn     | string       | The ARN of the KMS key used to encrypt data in the S3 buckets.                   | aws/s3 ARN     |
 | log_cookies            | bool         | Include cookies in the CloudFront access logs.                                   | `false`        |
-| force_destroy          | bool         | Destroy site buckets even if they're not empty.                                  | `false`
+| force_destroy          | bool         | Destroy site buckets even if they're not empty on a `terraform destroy` command. | `false`
 ## Outputs
 | Name            | Type                                                                                                     | Description                                             |
 | --------------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
