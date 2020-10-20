@@ -56,25 +56,25 @@ variable "cors_rules" {
 }
 
 variable "forward_query_strings" {
-  type = bool
-  default = false
+  type        = bool
+  default     = false
   description = "Forward query strings to the origin."
 }
 
 variable "encryption_key_arn" {
-  type = string
-  default = ''
+  type        = string
+  default     = ""
   description = "The ARN of the KMS key used to encrypt data in the S3 buckets."
 }
 
 variable "log_cookies" {
-  type = bool
-  default = false
+  type        = bool
+  default     = false
   description = "Include cookies in the CloudFront access logs."
 }
 
 variable "force_destroy" {
-  type = bool
-  default = false
+  type        = bool
+  default     = false
   description = "Destroy site buckets even if they're not empty."
 }

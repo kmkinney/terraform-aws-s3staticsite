@@ -2,11 +2,11 @@ terraform {
   required_version = ">= 0.12.16"
   required_providers {
     aws = {
-      source = "hashicorp/aws"
+      source  = "hashicorp/aws"
       version = ">= 3.0"
     }
     random = {
-      source = "hashicorp/random"
+      source  = "hashicorp/random"
       version = ">= 3.0"
     }
   }
@@ -48,7 +48,7 @@ resource "aws_route53_record" "cert_validation" {
 }
 
 resource "random_string" "cf_key" {
-  length = 32
+  length  = 32
   special = false
 }
 
@@ -67,7 +67,7 @@ resource "aws_cloudfront_distribution" "cdn" {
     }
 
     custom_header {
-      name = "Referer"
+      name  = "Referer"
       value = random_string.cf_key.result
     }
   }
@@ -138,8 +138,8 @@ resource "aws_route53_record" "custom_url_4a" {
 }
 
 resource "aws_s3_bucket" "website" {
-  bucket = var.s3_bucket_name
-  tags   = var.tags
+  bucket        = var.s3_bucket_name
+  tags          = var.tags
   force_destroy = var.force_destroy
 
   website {
@@ -191,8 +191,8 @@ data "aws_iam_policy_document" "static_website" {
     }
 
     condition {
-      test = "StringLike"
-      values = [random_string.cf_key.result]
+      test     = "StringLike"
+      values   = [random_string.cf_key.result]
       variable = "aws:Referer"
     }
   }
@@ -204,8 +204,8 @@ resource "aws_s3_bucket_policy" "static_website_read" {
 }
 
 resource "aws_s3_bucket" "logging" {
-  bucket = "${var.site_url}-access-logs"
-  tags   = var.tags
+  bucket        = "${var.site_url}-access-logs"
+  tags          = var.tags
   force_destroy = var.force_destroy
 
   lifecycle_rule {
