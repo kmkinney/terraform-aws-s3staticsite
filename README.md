@@ -41,7 +41,6 @@ module "s3_site" {
 | cloudfront_price_class | string      | The price class for the cloudfront distribution                                   | PriceClass_100 |
 | cors_rules             | list(object) | The CORS policies for S3 bucket                                                  | []             |
 | forward_query_strings  | bool         | Forward query strings to the origin.                                             | `false`        |
-| encryption_key_arn     | string       | The ARN of the KMS key used to encrypt data in the S3 buckets.                   | aws/s3 ARN     |
 | log_cookies            | bool         | Include cookies in the CloudFront access logs.                                   | `false`        |
 | force_destroy          | bool         | Destroy site buckets even if they're not empty on a `terraform destroy` command. | `false`
 | waf_acl_arn            | string       | The ARN of the WAF that should front the CloudFront distribution.                |

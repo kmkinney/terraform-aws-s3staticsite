@@ -173,8 +173,7 @@ resource "aws_s3_bucket" "website" {
   server_side_encryption_configuration {
     rule {
       apply_server_side_encryption_by_default {
-        sse_algorithm     = "aws:kms"
-        kms_master_key_id = var.encryption_key_arn == "" ? "alias/aws/s3" : var.encryption_key_arn
+        sse_algorithm = "AES256"
       }
     }
   }
@@ -237,8 +236,7 @@ resource "aws_s3_bucket" "logging" {
   server_side_encryption_configuration {
     rule {
       apply_server_side_encryption_by_default {
-        sse_algorithm     = "aws:kms"
-        kms_master_key_id = var.encryption_key_arn == "" ? "alias/aws/s3" : var.encryption_key_arn
+        sse_algorithm = "AES256"
       }
     }
   }
