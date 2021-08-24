@@ -17,9 +17,17 @@ provider "aws" {
   region = "us-east-1"
 }
 
+locals {
+  urls_to_zones = merge({
+    var.site_url = var.hosted_zone_id
+  }, var.alternate_urls_to_zone_ids)
+  alternate_urls = keys(var.alternate_urls_to_zone_ids)
+}
+
 resource "aws_acm_certificate" "cert" {
   provider          = aws.aws_n_va
   domain_name       = var.site_url
+  subject_alternative_names = local.alternate_urls
   validation_method = "DNS"
   tags              = var.tags
 }
@@ -36,13 +44,14 @@ resource "aws_route53_record" "cert_validation" {
       name   = dvo.resource_record_name
       record = dvo.resource_record_value
       type   = dvo.resource_record_type
+      domain = dvo.domain_name
     }
   }
 
   provider = aws.aws_n_va
   name     = each.value.name
   type     = each.value.type
-  zone_id  = var.hosted_zone_id
+  zone_id  = local.urls_to_zones[each.value.domain]
   records  = [each.value.record]
   ttl      = 60
 }
@@ -76,7 +85,7 @@ resource "aws_cloudfront_distribution" "cdn" {
   enabled             = true
   is_ipv6_enabled     = true
   default_root_object = var.index_doc
-  aliases             = [var.site_url]
+  aliases             = concat([var.site_url], local.alternate_urls)
   web_acl_id          = var.waf_acl_arn
 
   logging_config {
@@ -115,9 +124,11 @@ resource "aws_cloudfront_distribution" "cdn" {
 }
 
 resource "aws_route53_record" "custom_url_a" {
-  name    = var.site_url
+  for_each = tomap(local.urls_to_zones)
+
+  name    = each.key
   type    = "A"
-  zone_id = var.hosted_zone_id
+  zone_id = each.value
 
   alias {
     evaluate_target_health = false
@@ -127,9 +138,11 @@ resource "aws_route53_record" "custom_url_a" {
 }
 
 resource "aws_route53_record" "custom_url_4a" {
-  name    = var.site_url
+  for_each = tomap(local.urls_to_zones)
+
+  name    = each.key
   type    = "AAAA"
-  zone_id = var.hosted_zone_id
+  zone_id = each.value
 
   alias {
     evaluate_target_health = false

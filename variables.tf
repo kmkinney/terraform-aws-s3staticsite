@@ -21,6 +21,12 @@ variable "site_url" {
   description = "The URL for the site."
 }
 
+variable "alternate_urls_to_zone_ids" {
+  type = map(string)
+  description = "A map of alternate domain urls to the id of their hosted zone in Route 53"
+  default = {}
+}
+
 variable "wait_for_deployment" {
   type        = bool
   description = "Define if Terraform should wait for the distribution to deploy before completing."
